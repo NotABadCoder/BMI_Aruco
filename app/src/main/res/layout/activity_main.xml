@@ -1,0 +1,59 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <org.opencv.android.JavaCameraView
+        android:id="@+id/camera_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <ImageView
+        android:id="@+id/captured_image_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:foregroundGravity="center"
+        android:scaleType="centerCrop" />
+    <Button
+        android:id="@+id/capture_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Capture"
+
+        android:onClick="onCaptureButtonClick" />
+
+    <!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="25dp"-->
+<!--        android:layout_marginLeft="10dp"-->
+<!--        android:layout_marginRight="55dp"-->
+<!--        android:text="  BMI :"-->
+<!--        android:textColor="@color/black"-->
+
+<!--        android:gravity="left"-->
+<!--        android:textSize="20dp"-->
+<!--        android:background="@color/teal_200"/>-->
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="100dp"
+        android:layout_marginRight="100dp"
+        android:gravity="center"
+        android:textSize="20dp"
+        android:textColor="@color/black"
+        android:background="@color/teal_200"/>
+    <TextView
+        android:id="@+id/textWeight"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="100dp"
+        android:layout_marginRight="100dp"
+        android:gravity="center"
+        android:textSize="20dp"
+        android:textColor="@color/black"
+        android:background="@color/teal_200"/>
+
+
+
+</RelativeLayout>
