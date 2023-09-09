@@ -155,68 +155,65 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
-        capturedImageView = findViewById(R.id.captured_image_view);
 
         mOpenCvCameraView.setMaxFrameSize(2592, 1944);
         text = findViewById(R.id.text);
-        weight=findViewById(R.id.textWeight);
-        captureButton = findViewById(R.id.capture_button);
 //        weight = findViewById(R.id.weight);
         initializeCamera();
-        captureButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Call the captureFrame method when the button is clicked
-                if(mRGBA!=null)captureFrame(mRGBA);
-            }
-        });
+//        captureButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                // Call the captureFrame method when the button is clicked
+//
+//            }
+//        });
 
     }
 
-    private void captureFrame(Mat frame) {
-        // Check if the frame is available
-        if (frame != null) {
-            extractTextUsingMLKit(frame.clone());
-            Mat processedFrame = detectArucoFace(frame);
+//    private void captureFrame(Mat frame) {
+//        // Check if the frame is available
+//        if (frame != null) {
+//            extractTextUsingMLKit(frame.clone());
+//            Mat processedFrame = detectArucoFace(frame);
+//
+//            // Convert the processed frame to a bitmap for display
+//            if (processedFrame != null) {
+//                // Convert the processed frame to a bitmap for display
+//                Bitmap processedBitmap = Bitmap.createBitmap(processedFrame.cols(), processedFrame.rows(), Bitmap.Config.ARGB_8888);
+//                Utils.matToBitmap(processedFrame, processedBitmap);
+//
+//                // Release the processed frame since it's no longer needed
+//                processedFrame.release();
+//
+//                // Display the processed frame in the ImageView
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        // Set the bitmap in the ImageView
+//                        capturedImageView.setImageBitmap(processedBitmap);
+//
+//                    }
+//                });
+//
+//            }
 
-            // Convert the processed frame to a bitmap for display
-            if (processedFrame != null) {
-                // Convert the processed frame to a bitmap for display
-                Bitmap processedBitmap = Bitmap.createBitmap(processedFrame.cols(), processedFrame.rows(), Bitmap.Config.ARGB_8888);
-                Utils.matToBitmap(processedFrame, processedBitmap);
-
-                // Release the processed frame since it's no longer needed
-                processedFrame.release();
-
-                // Display the processed frame in the ImageView
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Set the bitmap in the ImageView
-                        capturedImageView.setImageBitmap(processedBitmap);
-
-                    }
-                });
-
-            }
-
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            // Clear the ImageView
-                            capturedImageView.setImageBitmap(null);
-                        }
-                    });
-                }
-            }, 5000); // Delay of 50 seconds
-
-            // Release the input frame
-            frame.release();
-        }
-    }
+//            new Handler().postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            // Clear the ImageView
+//                            capturedImageView.setImageBitmap(null);
+//                        }
+//                    });
+//                }
+//            }, 5000); // Delay of 50 seconds
+//
+//            // Release the input frame
+//            frame.release();
+//        }
+//    }
 
 
     @Override
@@ -334,15 +331,15 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             mRGBA.release();
         }
         mRGBA=inputFrame.rgba().clone();
-//        if(!isFrameProcessing) {
-//            isFrameProcessing = true;
-//
-//            frame=mRGBA.clone();
-//            Log.i("onCameraFrame", "mRGBA is not empty");
-//            executorService.submit(() -> detectArucoFace(frame));
-//        } else {
-//            Log.i("onCameraFrame", "mRGBA is empty");
-//        }
+        if(!isFrameProcessing) {
+            isFrameProcessing = true;
+
+            frame=mRGBA.clone();
+            Log.i("onCameraFrame", "mRGBA is not empty");
+            executorService.submit(() -> detectArucoFace(frame));
+        } else {
+            Log.i("onCameraFrame", "mRGBA is empty");
+        }
         return mRGBA;
     }
     class Marker {
@@ -355,13 +352,13 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }
     }
 
-    private Mat detectArucoFace(Mat mat) {
+    private void detectArucoFace(Mat mat) {
         Log.i("detectArucoFace", "Entered detectArucoFace");
 
         if(mat.empty()){
             Log.e("detectArucoFace", "Frame is empty");
             mat.release();
-            return null;
+            return;
         }
         Mat gray = new Mat();
         List<Mat> corners = new ArrayList<>();
@@ -482,7 +479,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }
         if(imgPoints.size()==refPoints.size() && imgPoints.size()!=0){
 //            text.setText("ProcessStarted");
-            mat = perspectiveCorrection(mat, imgPoints, refPoints);
+            perspectiveCorrection(mat, imgPoints, refPoints);
 
 //            text.setText("Finished");
         }
@@ -495,12 +492,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         gray.release();
 
 
-//        frame.release();
+        frame.release();
         isFrameProcessing=false;
-        return mat;
+//        return mat;
 
     }
-    public Mat perspectiveCorrection(Mat src, List<Point> imgPoints, List<Point> refPoints) {
+    public void perspectiveCorrection(Mat src, List<Point> imgPoints, List<Point> refPoints) {
         MatOfPoint2f imgPoint2f = new MatOfPoint2f();
         imgPoint2f.fromList(imgPoints);
         MatOfPoint2f refPoint2f = new MatOfPoint2f();
@@ -528,59 +525,59 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             text.setText(String.format("%.2f", length));
         }
 
-
+        src.release();
         faces.release();
 //        text.setText("Processed");
 
         gray.release();
-        return dst;
+//        return dst;
     }
-    private void extractTextUsingMLKit(Mat rgbaImage) {
-        // Convert the RGBA image to a Bitmap
-        Bitmap image = Bitmap.createBitmap(rgbaImage.cols(), rgbaImage.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(rgbaImage, image);
-
-        // Create an ML Kit TextRecognizer
-        TextRecognizer textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
-
-        // Create an ML Kit InputImage from the Bitmap
-        InputImage inputImage = InputImage.fromBitmap(image, 0);
-
-        // Process the image and extract text
-        Task<Text> result = textRecognizer.process(inputImage)
-                .addOnSuccessListener(new OnSuccessListener<Text>() {
-                    @Override
-                    public void onSuccess(Text visionText) {
-                        // Get the extracted text
-                        String extractedText = visionText.getText();
-                        // Process the extracted text as needed
-
-                        for (Text.TextBlock block : visionText.getTextBlocks()) {
-                            for (Text.Line line : block.getLines()) {
-                                // Get the concatenated string in each line
-                                String lineString = line.getText();
-                                boolean ok=true;
-                                for(int i=0;i<lineString.length();i++){
-                                    char set=lineString.charAt(i);
-                                    if((set<'0' || set>'9') &&(set!='.' && set!=',')){
-                                        ok=false;
-                                    }
-                                }
-                                if(ok && lineString.length()>0)weight.setText(lineString);
-                                // Add the line string to the list
-                            }
-                        }
-
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Handle any errors that occur during text recognition
-                        e.printStackTrace();
-                    }
-                });
-    }
+//    private void extractTextUsingMLKit(Mat rgbaImage) {
+//        // Convert the RGBA image to a Bitmap
+//        Bitmap image = Bitmap.createBitmap(rgbaImage.cols(), rgbaImage.rows(), Bitmap.Config.ARGB_8888);
+//        Utils.matToBitmap(rgbaImage, image);
+//
+//        // Create an ML Kit TextRecognizer
+//        TextRecognizer textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+//
+//        // Create an ML Kit InputImage from the Bitmap
+//        InputImage inputImage = InputImage.fromBitmap(image, 0);
+//
+//        // Process the image and extract text
+//        Task<Text> result = textRecognizer.process(inputImage)
+//                .addOnSuccessListener(new OnSuccessListener<Text>() {
+//                    @Override
+//                    public void onSuccess(Text visionText) {
+//                        // Get the extracted text
+//                        String extractedText = visionText.getText();
+//                        // Process the extracted text as needed
+//
+//                        for (Text.TextBlock block : visionText.getTextBlocks()) {
+//                            for (Text.Line line : block.getLines()) {
+//                                // Get the concatenated string in each line
+//                                String lineString = line.getText();
+//                                boolean ok=true;
+//                                for(int i=0;i<lineString.length();i++){
+//                                    char set=lineString.charAt(i);
+//                                    if((set<'0' || set>'9') &&(set!='.' && set!=',')){
+//                                        ok=false;
+//                                    }
+//                                }
+//                                if(ok && lineString.length()>0)weight.setText(lineString);
+//                                // Add the line string to the list
+//                            }
+//                        }
+//
+//                    }
+//                })
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        // Handle any errors that occur during text recognition
+//                        e.printStackTrace();
+//                    }
+//                });
+//    }
 
 
 
